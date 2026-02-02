@@ -9,6 +9,7 @@ export interface Ticket {
   priority: TicketPriority;
   tags: string[];
   assignee: string;
+  value?: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -20,8 +21,8 @@ export interface Column {
 }
 
 export const COLUMNS: { id: TicketStatus; title: string }[] = [
-  { id: 'todo', title: 'Todo' },
+  { id: 'todo', title: 'To Do' },
   { id: 'inprogress', title: 'In Progress' },
-  { id: 'hold', title: 'Hold' },
-  { id: 'done', title: 'Done' },
+  { id: 'hold', title: 'On Hold' },
+  { id: 'done', title: 'Completed' },
 ];

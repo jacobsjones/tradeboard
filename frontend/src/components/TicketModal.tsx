@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Trash2, Save } from 'lucide-react';
+import { X, Trash2, Save, Hash, User, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { type Ticket, type TicketPriority, type TicketStatus } from '../types/ticket';
 
 interface TicketModalProps {
@@ -8,6 +8,31 @@ interface TicketModalProps {
   onClose: () => void;
   onSave: (ticket: Partial<Ticket>) => void;
   onDelete?: () => void;
+}
+
+const priorityOptions: { value: TicketPriority; label: string; color: string }[] = [
+  { value: 'high', label: 'High Priority', color: 'text-priority-high bg-priority-high/10 border-priority-high/20' },
+  { value: 'medium', label: 'Medium Priority', color: 'text-priority-medium bg-priority-medium/10 border-priority-medium/20' },
+  { value: 'low', label: 'Low Priority', color: 'text-priority-low bg-priority-low/10 border-priority-low/20' },
+];
+
+const statusOptions: { value: TicketStatus; label: string; color: string }[] = [
+  { value: 'todo', label: 'To Do', color: 'text-column-todo' },
+  { value: 'inprogress', label: 'In Progress', color: 'text-column-inprogress' },
+  { value: 'hold', label: 'On Hold', color: 'text-column-hold' },
+  { value: 'done', label: 'Done', color: 'text-column-done' },
+];
+
+const tagColors = [
+  'bg-blue-500/10 text-blue-400 border-blue-500/20',
+  'bg-purple-500/10 text-purple-400 border-purple-500/20',
+  'bg-cyan-500/10 text-cyan-400 border-cyan-500/20',
+  'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+  'bg-amber-500/10 text-amber-400 border-amber-500/20',
+];
+
+function getTagColor(index: number): string {
+  return tagColors[index % tagColors.length];
 }
 
 export function TicketModal({ ticket, isOpen, onClose, onSave, onDelete }: TicketModalProps) {
@@ -64,167 +89,190 @@ export function TicketModal({ ticket, isOpen, onClose, onSave, onDelete }: Ticke
 
   if (!isOpen) return null;
 
+  const selectedPriority = priorityOptions.find(p => p.value === formData.priority);
+
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white dark:bg-gray-900 rounded-xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+    <div className="modal-overlay" onClick={onClose}>
+      <div 
+        className="modal-content max-h-[90vh] overflow-hidden flex flex-col"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-800">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-            {ticket ? 'Edit Ticket' : 'New Ticket'}
-          </h2>
+        <div className="modal-header">
+          <div className="flex items-center gap-3">
+            <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${selectedPriority?.color}`}>
+              <AlertCircle className="w-5 h-5" />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-white">
+                {ticket ? 'Edit Trade' : 'New Trade'}
+              </h2>
+              <p className="text-xs text-trade-400">
+                {ticket ? 'Update trade details' : 'Create a new trade ticket'}
+              </p>
+            </div>
+          </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+            className="p-2 rounded-lg text-trade-400 hover:text-white hover:bg-trade-600/50 transition-all duration-200"
           >
-            <X className="w-5 h-5 text-gray-500" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          {/* Title */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Title *
-            </label>
-            <input
-              type="text"
-              required
-              value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:border-blue-500 dark:bg-gray-800 dark:text-white"
-              placeholder="Enter ticket title"
-            />
-          </div>
-
-          {/* Description */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Description
-            </label>
-            <textarea
-              rows={3}
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:border-blue-500 dark:bg-gray-800 dark:text-white resize-none"
-              placeholder="Enter description"
-            />
-          </div>
-
-          {/* Status & Priority */}
-          <div className="grid grid-cols-2 gap-4">
+        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto">
+          <div className="modal-body space-y-5">
+            {/* Title */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Status
-              </label>
-              <select
-                value={formData.status}
-                onChange={(e) => setFormData({ ...formData, status: e.target.value as TicketStatus })}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:border-blue-500 dark:bg-gray-800 dark:text-white"
-              >
-                <option value="todo">Todo</option>
-                <option value="inprogress">In Progress</option>
-                <option value="hold">Hold</option>
-                <option value="done">Done</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Priority
-              </label>
-              <select
-                value={formData.priority}
-                onChange={(e) => setFormData({ ...formData, priority: e.target.value as TicketPriority })}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:border-blue-500 dark:bg-gray-800 dark:text-white"
-              >
-                <option value="low">Low</option>
-                <option value="medium">Medium</option>
-                <option value="high">High</option>
-              </select>
-            </div>
-          </div>
-
-          {/* Assignee */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Assignee
-            </label>
-            <input
-              type="text"
-              value={formData.assignee}
-              onChange={(e) => setFormData({ ...formData, assignee: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:border-blue-500 dark:bg-gray-800 dark:text-white"
-              placeholder="Assignee name"
-            />
-          </div>
-
-          {/* Tags */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Tags
-            </label>
-            <div className="flex gap-2 mb-2">
+              <label className="form-label">Trade Title *</label>
               <input
                 type="text"
-                value={tagInput}
-                onChange={(e) => setTagInput(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddTag())}
-                className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:border-blue-500 dark:bg-gray-800 dark:text-white"
-                placeholder="Add tag and press Enter"
+                required
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                className="form-input"
+                placeholder="e.g., AAPL Call Options"
               />
-              <button
-                type="button"
-                onClick={handleAddTag}
-                className="px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-              >
-                Add
-              </button>
             </div>
-            <div className="flex flex-wrap gap-2">
-              {formData.tags?.map((tag) => (
-                <span
-                  key={tag}
-                  className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-sm rounded"
-                >
-                  #{tag}
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveTag(tag)}
-                    className="hover:text-blue-900"
+
+            {/* Description */}
+            <div>
+              <label className="form-label">Description</label>
+              <textarea
+                rows={3}
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                className="form-input resize-none"
+                placeholder="Add trade notes, strategy, or observations..."
+              />
+            </div>
+
+            {/* Status & Priority */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="form-label">Status</label>
+                <div className="relative">
+                  <select
+                    value={formData.status}
+                    onChange={(e) => setFormData({ ...formData, status: e.target.value as TicketStatus })}
+                    className="form-input appearance-none cursor-pointer"
                   >
-                    <X className="w-3 h-3" />
-                  </button>
-                </span>
-              ))}
+                    {statusOptions.map((status) => (
+                      <option key={status.value} value={status.value}>
+                        {status.label}
+                      </option>
+                    ))}
+                  </select>
+                  <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-trade-400 pointer-events-none" />
+                </div>
+              </div>
+              <div>
+                <label className="form-label">Priority</label>
+                <div className="relative">
+                  <select
+                    value={formData.priority}
+                    onChange={(e) => setFormData({ ...formData, priority: e.target.value as TicketPriority })}
+                    className="form-input appearance-none cursor-pointer"
+                  >
+                    {priorityOptions.map((priority) => (
+                      <option key={priority.value} value={priority.value}>
+                        {priority.label}
+                      </option>
+                    ))}
+                  </select>
+                  <AlertCircle className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-trade-400 pointer-events-none" />
+                </div>
+              </div>
+            </div>
+
+            {/* Assignee */}
+            <div>
+              <label className="form-label">Assignee</label>
+              <div className="relative">
+                <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-trade-400" />
+                <input
+                  type="text"
+                  value={formData.assignee}
+                  onChange={(e) => setFormData({ ...formData, assignee: e.target.value })}
+                  className="form-input pl-10"
+                  placeholder="Assignee name"
+                />
+              </div>
+            </div>
+
+            {/* Tags */}
+            <div>
+              <label className="form-label">Tags</label>
+              <div className="flex gap-2 mb-3">
+                <div className="relative flex-1">
+                  <Hash className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-trade-400" />
+                  <input
+                    type="text"
+                    value={tagInput}
+                    onChange={(e) => setTagInput(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddTag())}
+                    className="form-input pl-10"
+                    placeholder="Add tag and press Enter"
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={handleAddTag}
+                  className="btn-secondary px-4"
+                >
+                  Add
+                </button>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {formData.tags?.map((tag, index) => (
+                  <span
+                    key={tag}
+                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border ${getTagColor(index)}`}
+                  >
+                    #{tag}
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveTag(tag)}
+                      className="hover:opacity-70 transition-opacity"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                ))}
+                {formData.tags?.length === 0 && (
+                  <p className="text-xs text-trade-500 italic">No tags added</p>
+                )}
+              </div>
             </div>
           </div>
 
           {/* Actions */}
-          <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-800">
+          <div className="modal-footer">
             {onDelete && (
               <button
                 type="button"
                 onClick={onDelete}
-                className="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-priority-high bg-priority-high/10 border border-priority-high/20 hover:bg-priority-high/20 transition-all duration-200"
               >
                 <Trash2 className="w-4 h-4" />
-                Delete
+                <span className="text-sm font-medium">Delete</span>
               </button>
             )}
-            <div className="flex items-center gap-2 ml-auto">
+            <div className="flex items-center gap-3 ml-auto">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                className="btn-secondary"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                className="btn-primary"
               >
                 <Save className="w-4 h-4" />
-                Save
+                Save Trade
               </button>
             </div>
           </div>

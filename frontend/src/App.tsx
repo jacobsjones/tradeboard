@@ -19,9 +19,9 @@ function App() {
   }, [darkMode]);
 
   return (
-    <div className="flex min-h-screen bg-kanban-bg dark:bg-kanban-dark">
+    <div className="app-container flex min-h-screen">
       <Sidebar darkMode={darkMode} onToggleDarkMode={() => setDarkMode(!darkMode)} />
-      <main className="flex-1 ml-60">
+      <main className="flex-1 ml-64">
         <KanbanBoard />
       </main>
     </div>
