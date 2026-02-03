@@ -1,4 +1,4 @@
-import { LayoutDashboard, Settings, BarChart3, Bell, Moon, Sun, LogOut, FolderKanban, TrendingUp, CreditCard, HelpCircle } from 'lucide-react';
+import { LayoutDashboard, Settings, BarChart3, Bell, Moon, Sun, LogOut, FolderKanban, Layout, CheckSquare, HelpCircle } from 'lucide-react';
 
 interface SidebarProps {
   darkMode: boolean;
@@ -9,9 +9,8 @@ export function Sidebar({ darkMode, onToggleDarkMode }: SidebarProps) {
   const navItems = [
     { icon: LayoutDashboard, label: 'Dashboard', active: false },
     { icon: FolderKanban, label: 'Board', active: true },
-    { icon: TrendingUp, label: 'Trades', active: false },
+    { icon: CheckSquare, label: 'Tasks', active: false },
     { icon: BarChart3, label: 'Analytics', active: false },
-    { icon: CreditCard, label: 'Positions', active: false },
   ];
 
   const bottomItems = [
@@ -25,10 +24,10 @@ export function Sidebar({ darkMode, onToggleDarkMode }: SidebarProps) {
       {/* Logo */}
       <div className="sidebar-logo">
         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent-blue to-accent-purple flex items-center justify-center shadow-glow-blue">
-          <TrendingUp className="w-5 h-5 text-white" />
+          <Layout className="w-5 h-5 text-white" />
         </div>
         <div>
-          <span className="text-white font-bold text-lg tracking-tight">TradeBoard</span>
+          <span className="text-white font-bold text-lg tracking-tight">TaskBoard</span>
           <p className="text-[10px] text-trade-400 uppercase tracking-wider">Pro</p>
         </div>
       </div>
@@ -111,7 +110,7 @@ export function Sidebar({ darkMode, onToggleDarkMode }: SidebarProps) {
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-white truncate">Jacob</p>
-            <p className="text-xs text-trade-400 truncate">Pro Trader</p>
+            <p className="text-xs text-trade-400 truncate">Team Member</p>
           </div>
           <button className="p-1.5 rounded-lg text-trade-400 hover:text-white hover:bg-trade-600 transition-colors">
             <LogOut className="w-4 h-4" />

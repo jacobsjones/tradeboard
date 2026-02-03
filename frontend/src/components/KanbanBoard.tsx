@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { DragDropContext, type DropResult } from '@hello-pangea/dnd';
-import { Search, Plus, Filter, TrendingUp, Bell, Settings } from 'lucide-react';
+import { Search, Plus, Filter, Layout, Bell, Settings } from 'lucide-react';
 import { type Ticket, type TicketStatus, type TicketPriority, COLUMNS } from '../types/ticket';
 import { initialTickets } from '../data/initialData';
 import { KanbanColumn } from './KanbanColumn';
@@ -130,13 +130,13 @@ export function KanbanBoard() {
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent-blue to-accent-purple flex items-center justify-center shadow-glow-blue">
-                  <TrendingUp className="w-5 h-5 text-white" />
+                  <Layout className="w-5 h-5 text-white" />
                 </div>
                 <div>
                   <h1 className="text-xl font-bold text-white tracking-tight">
-                    Trade<span className="text-gradient">Board</span>
+                    Task<span className="text-gradient">Board</span>
                   </h1>
-                  <p className="text-xs text-trade-400">Trading Workflow Management</p>
+                  <p className="text-xs text-trade-400">Task Management</p>
                 </div>
               </div>
             </div>
@@ -154,7 +154,7 @@ export function KanbanBoard() {
                 className="btn-primary"
               >
                 <Plus className="w-4 h-4" />
-                New Trade
+                New Task
               </button>
             </div>
           </div>
@@ -187,7 +187,7 @@ export function KanbanBoard() {
                 <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-trade-400" />
                 <input
                   type="text"
-                  placeholder="Search trades, tags..."
+                  placeholder="Search tasks, tags..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="search-input w-64"
